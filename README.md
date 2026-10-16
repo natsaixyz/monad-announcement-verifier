@@ -37,21 +37,6 @@ Those fingerprints match Monad's [published authorized signer list](https://docs
 
 For non-Docker use: install Python 3.11+ and `gpg`, then `python app.py` (default port 8080). The Docker image runs as an unprivileged user with a read-only filesystem.
 
-## Publish to GitHub
-
-Create an empty **public** repository named `monad-announcement-verifier` under [github.com/natsaixyz](https://github.com/natsaixyz). In the extracted folder:
-
-```bash
-git init
-git add .
-git commit -m "Initial open-source Monad announcement verifier"
-git branch -M main
-git remote add origin https://github.com/natsaixyz/monad-announcement-verifier.git
-git push -u origin main
-```
-
-Or use GitHub's **Add file → Upload files** and drag in the extracted files/folders (keep `.github/workflows/ci.yml` intact). The repository URL won't exist until you publish it.
-
 ## Security model
 
 - Only GitHub links to `monad-crypto/mf-nodeops-comms` (and `mf-N` numbers) are accepted; users cannot choose a remote fetch URL. The server downloads one bounded GitHub ZIP snapshot for each request.
