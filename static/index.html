@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Verify Monad Foundation announcements with GPG. Open source and self-hostable.">
+  <title>Monad Announcement Verifier · Natsai</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="/" aria-label="Monad Announcement Verifier">
+        <span class="brand-mark" aria-hidden="true">N</span>
+        <span>NATSAI <span class="brand-light">/ MONAD VERIFY</span></span>
+      </a>
+      <a class="top-link" href="https://github.com/natsaixyz/monad-announcement-verifier" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+    </div>
+  </header>
+
+  <main class="shell main">
+    <h1>Verify Monad announcements.</h1>
+
+    <section class="panel" aria-label="Verify an announcement">
+      <form id="verify-form">
+        <label for="announcement-url">Announcement URL or ID</label>
+        <div class="input-line">
+          <input id="announcement-url" name="announcement-url" required spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="mf-1 or official GitHub URL" value="mf-1">
+          <button type="submit" id="verify-button"><span id="button-label">Verify</span><span aria-hidden="true"> →</span></button>
+        </div>
+      </form>
+      <div id="processing" class="processing" role="status" hidden><span class="spinner" aria-hidden="true"></span>Verifying signatures…</div>
+      <div id="error" class="error" role="alert" hidden></div>
+    </section>
+
+    <section id="result" class="result" aria-label="Verification result" aria-live="polite" hidden>
+      <div class="result-heading">
+        <div class="result-symbol" aria-hidden="true">✓</div>
+        <div class="result-heading-text">
+          <h2 id="result-title">MF #1 · Verified</h2>
+          <p id="result-meta">2 authorized signatures · 2026-10-16 05:45 UTC</p>
+        </div>
+        <span id="result-severity" class="severity">GREEN</span>
+      </div>
+      <details class="disclosure">
+        <summary>Signed announcement <span class="chevron" aria-hidden="true"></span></summary>
+        <div class="disclosure-body">
+          <pre id="result-message" class="message"></pre>
+          <a id="result-source" class="source" href="#" rel="noopener noreferrer" target="_blank">View source ↗</a>
+        </div>
+      </details>
+      <details class="disclosure">
+        <summary>Signer fingerprints <span class="chevron" aria-hidden="true"></span></summary>
+        <div class="disclosure-body"><ul id="signers" class="signer-list"></ul></div>
+      </details>
+    </section>
+
+    <p class="trust-note">Checks this server's pinned keys. Independently verify before critical actions. <a href="https://docs.monad.xyz/node-ops/announcements" target="_blank" rel="noopener noreferrer">Monad docs ↗</a></p>
+  </main>
+  <footer class="shell footer"><span>NATSAI · COMMUNITY TOOL · NOT OFFICIAL MONAD</span><a href="https://github.com/natsaixyz/monad-announcement-verifier" target="_blank" rel="noopener noreferrer">OPEN SOURCE ↗</a></footer>
+</body>
+</html>
