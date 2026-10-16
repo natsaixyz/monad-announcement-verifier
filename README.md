@@ -1,5 +1,8 @@
 # Monad Announcement Verifier
 
+**Live Verifier:** https://monad-verify.natsai.xyz
+
+
 A minimal, read-only GPG verification page for [Monad Foundation node-operator announcements](https://docs.monad.xyz/node-ops/announcements).
 
 Paste an official GitHub `mf-N` announcement URL → verify **two distinct authorized signatures** → read the signed message. No login, database, wallet, validator access, or external Python packages.
