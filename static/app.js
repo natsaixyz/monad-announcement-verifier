@@ -7,6 +7,25 @@ const processing = document.querySelector('#processing');
 const errorBox = document.querySelector('#error');
 const result = document.querySelector('#result');
 
+// Preselect the latest *published* announcement without claiming it is verified.
+// Never overwrite a number/URL the operator has started typing.
+let userEdited = false;
+input.addEventListener('input', () => { userEdited = true; });
+(async () => {
+  try {
+    const response = await fetch('/api/latest', { cache: 'no-store' });
+    if (!response.ok) throw new Error('Latest unavailable');
+    const data = await response.json();
+    if (Number.isSafeInteger(data.number) && data.number >= 0 && !userEdited && !input.value.trim()) {
+      input.value = `mf-${data.number}`;
+    }
+  } catch (_) {
+    // Offline/GitHub unavailable: operator can enter a number or URL manually.
+  } finally {
+    input.placeholder = 'mf-N or official GitHub URL';
+  }
+})();
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   result.hidden = true;

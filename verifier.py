@@ -89,6 +89,34 @@ def download_archive() -> bytes:
     return data
 
 
+def latest_announcement_number(archive_bytes: bytes) -> int:
+    """Discover the highest public mf-N folder with both announcement files.
+
+    Discovery is NOT signature verification. The normal /api/verify process
+    independently authenticates the selected announcement on user request.
+    """
+    try:
+        with zipfile.ZipFile(io.BytesIO(archive_bytes)) as archive:
+            if len(archive.infolist()) > 20000:
+                raise VerificationError("Official repository contains too many files.")
+            found: dict[int, set[str]] = {}
+            for info in archive.infolist():
+                match = re.fullmatch(
+                    r"mf-nodeops-comms-main/announcements/mf-(0|[1-9]\d{0,5})/"
+                    r"(announcement\.(?:txt|sig))",
+                    info.filename,
+                )
+                if match and not info.is_dir() and 0 < info.file_size <= MAX_ANNOUNCEMENT:
+                    found.setdefault(int(match.group(1)), set()).add(match.group(2))
+            complete = [number for number, files in found.items()
+                        if {"announcement.txt", "announcement.sig"} <= files]
+            if not complete:
+                raise VerificationError("No complete public Monad announcements were found.")
+            return max(complete)
+    except (zipfile.BadZipFile, EOFError, OSError) as exc:
+        raise VerificationError("Malformed or damaged repository archive.") from exc
+
+
 def _zip_member(archive: zipfile.ZipFile, suffix: str, limit: int) -> bytes:
     name = "mf-nodeops-comms-main/" + suffix
     try:

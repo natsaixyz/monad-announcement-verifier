@@ -2,10 +2,9 @@
 
 **Live Verifier:** https://monad-verify.natsai.xyz
 
-
 A minimal, read-only GPG verification page for [Monad Foundation node-operator announcements](https://docs.monad.xyz/node-ops/announcements).
 
-Paste an official GitHub `mf-N` announcement URL → verify **two distinct authorized signatures** → read the signed message. No login, database, wallet, validator access, or external Python packages.
+The latest public `mf-N` is preselected automatically (or paste an official GitHub URL) → verify **two distinct authorized signatures** → read the signed message. No login, database, wallet, validator access, or external Python packages.
 
 ## Run it
 
@@ -41,6 +40,8 @@ Those fingerprints match Monad's [published authorized signer list](https://docs
 For non-Docker use: install Python 3.11+ and `gpg`, then `python app.py` (default port 8080). The Docker image runs as an unprivileged user with a read-only filesystem.
 
 ## Security model
+
+- The latest announcement number is discovered from Monad's GitHub repository and cached for 5 minutes. Discovery **does not** authenticate an announcement; click **Verify** to perform GPG verification. If GitHub is unavailable, enter an MF number manually.
 
 - Only GitHub links to `monad-crypto/mf-nodeops-comms` (and `mf-N` numbers) are accepted; users cannot choose a remote fetch URL. The server downloads one bounded GitHub ZIP snapshot for each request.
 - Files are extracted **in memory by exact path**; nothing from the repository is executed.

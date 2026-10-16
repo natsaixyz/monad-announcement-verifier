@@ -12,7 +12,7 @@ from pathlib import Path
 
 from verifier import (
     VerificationError, inspect_announcement, load_config, parse_number,
-    repository_files, verify_announcement, verify_signatures,
+    repository_files, latest_announcement_number, verify_announcement, verify_signatures,
 )
 
 
@@ -75,6 +75,33 @@ class ParsingTests(unittest.TestCase):
         config = load_config(Path(__file__).resolve().parent.parent / 'config.json')
         self.assertEqual(len(config['trusted_fingerprints']), 5)
         self.assertEqual(config['required_signatures'], 2)
+
+
+class LatestNumberTests(unittest.TestCase):
+    def fixture_zip(self, paths):
+        bio = io.BytesIO()
+        with zipfile.ZipFile(bio, 'w') as archive:
+            for path in paths:
+                archive.writestr('mf-nodeops-comms-main/' + path, b'contents')
+        return bio.getvalue()
+
+    def test_highest_complete_number(self):
+        archive = self.fixture_zip([
+            'announcements/mf-0/announcement.txt', 'announcements/mf-0/announcement.sig',
+            'announcements/mf-7/announcement.txt', 'announcements/mf-7/announcement.sig',
+            'announcements/mf-8/announcement.txt',  # Not published as a signed pair yet
+            'announcements/mf-99/notes.txt',
+        ])
+        self.assertEqual(latest_announcement_number(archive), 7)
+
+    def test_no_complete_pair(self):
+        archive = self.fixture_zip(['announcements/mf-8/announcement.txt'])
+        with self.assertRaises(VerificationError):
+            latest_announcement_number(archive)
+
+    def test_malformed_zip(self):
+        with self.assertRaises(VerificationError):
+            latest_announcement_number(b'not a zip')
 
 
 class GPGTests(unittest.TestCase):

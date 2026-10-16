@@ -5,11 +5,12 @@ import json
 import logging
 import os
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from verifier import VerificationError, load_config, parse_number, verify_announcement
+from verifier import VerificationError, download_archive, latest_announcement_number, load_config, parse_number, verify_announcement
 
 ROOT = Path(__file__).resolve().parent
 CONFIG = load_config(Path(os.environ.get("VERIFIER_CONFIG", str(ROOT / "config.json"))))
@@ -17,6 +18,24 @@ STATIC = {"/": ("index.html", "text/html; charset=utf-8"),
           "/app.js": ("app.js", "application/javascript; charset=utf-8"),
           "/styles.css": ("styles.css", "text/css; charset=utf-8")}
 SLOTS = threading.BoundedSemaphore(2)
+LATEST_LOCK = threading.Lock()
+LATEST_CACHE = {"number": None, "expires": 0.0}
+
+
+def get_latest_number() -> int:
+    """Cache GitHub directory discovery for 5m; failures for 30s."""
+    with LATEST_LOCK:
+        if time.monotonic() >= LATEST_CACHE["expires"]:
+            try:
+                LATEST_CACHE["number"] = latest_announcement_number(download_archive())
+            except VerificationError:
+                LATEST_CACHE["number"] = None
+            finally:
+                LATEST_CACHE["expires"] = time.monotonic() + (300 if LATEST_CACHE["number"] is not None else 30)
+        if LATEST_CACHE["number"] is None:
+            raise VerificationError("Latest announcement temporarily unavailable. Enter an MF number manually.")
+        return LATEST_CACHE["number"]
+
 SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
@@ -45,6 +64,11 @@ class Handler(BaseHTTPRequestHandler):
         path = urlsplit(self.path).path
         if path == "/health":
             return self.json_response(200, {"status": "ok"})
+        if path == "/api/latest":
+            try:
+                return self.json_response(200, {"number": get_latest_number()})
+            except VerificationError as exc:
+                return self.json_response(503, {"error": str(exc)})
         if path not in STATIC:
             return self.json_response(404, {"error": "Not found."})
         filename, mime = STATIC[path]

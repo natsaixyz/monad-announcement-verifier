@@ -26,10 +26,22 @@ class HTTPTests(unittest.TestCase):
 
     def test_home_and_health(self):
         with urllib.request.urlopen(self.base + '/') as r:
-            self.assertIn(b'Know it', r.read())
+            self.assertIn(b'Verify Monad announcements', r.read())
             self.assertIn('Content-Security-Policy', r.headers)
         with urllib.request.urlopen(self.base + '/health') as r:
             self.assertEqual(json.load(r)['status'], 'ok')
+
+    def test_latest_endpoint(self):
+        with patch('app.get_latest_number', return_value=12):
+            with urllib.request.urlopen(self.base + '/api/latest') as response:
+                self.assertEqual(json.load(response), {'number': 12})
+
+    def test_latest_endpoint_unavailable(self):
+        from verifier import VerificationError
+        with patch('app.get_latest_number', side_effect=VerificationError('Temporarily unavailable')):
+            with self.assertRaises(urllib.error.HTTPError) as err:
+                urllib.request.urlopen(self.base + '/api/latest')
+            self.assertEqual(err.exception.code, 503)
 
     def test_rejects_unsafe_url(self):
         req = urllib.request.Request(self.base + '/api/verify', data=json.dumps({'url': 'https://evil.example'}).encode(), headers={'Content-Type':'application/json'}, method='POST')
