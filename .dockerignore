@@ -6,3 +6,6 @@ __pycache__
 tests
 README.md
 LICENSE
+
+.env.watcher
+watcher-state
