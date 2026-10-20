@@ -55,11 +55,8 @@ form.addEventListener('submit', async (event) => {
 });
 
 function showResult(data) {
-  document.querySelector('#result-title').textContent = `MF #${data.number} · Verified`;
-  document.querySelector('#result-meta').textContent = `${data.signers.length} authorized signatures · ${data.created}`;
-  const severity = document.querySelector('#result-severity');
-  severity.textContent = data.severity === 'UNCLASSIFIED' ? 'UNCLASSIFIED' : data.severity;
-  severity.className = 'severity ' + (data.severity === 'ORANGE' ? 'orange' : data.severity === 'RED' ? 'red' : data.severity !== 'GREEN' ? 'unknown' : '');
+  document.querySelector('#result-title').textContent = `mf-${data.number} · GPG signatures verified`;
+  document.querySelector('#result-meta').textContent = `${data.signers.length} distinct authorized signers · signatures only`;
   const signers = document.querySelector('#signers');
   signers.replaceChildren();
   for (const fingerprint of data.signers) {

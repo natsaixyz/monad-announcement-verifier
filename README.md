@@ -20,6 +20,8 @@ Open `http://localhost:8080` on the host. The service binds to `127.0.0.1`; use 
 
 ## Trust & scope
 
+**Verification:** GnuPG checks the original files against at least two distinct pinned authorized primary keys. Announcement text is not parsed. Dates, expiry, severity and the message/folder number match are **not checked**; operators must review the signed message before acting. Folder IDs are source locations, not authenticated announcement numbers.
+
 - Uses local, pinned public-key fingerprints from [`config.json`](config.json). **Check them against [Monad's official list](https://docs.monad.xyz/node-ops/gpg-keys.json)** before relying on results; review key rotations manually.
 - Verifies public GitHub announcements only. No validator access, private keys, or automatic execution.
 - The hosted site reports **Natsai's** verification result. Self-host for independent verification. Not an official Monad Foundation tool.
