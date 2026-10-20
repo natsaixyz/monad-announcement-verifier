@@ -1,4 +1,9 @@
 'use strict';
+// Natsai hosted demo notice: do not label independent installations as our demo.
+const natsaiDemoNotice = document.getElementById('natsai-demo-notice');
+if (natsaiDemoNotice && window.location.hostname.replace(/\.$/, '') !== 'monad-verify.natsai.xyz') {
+  natsaiDemoNotice.hidden = true;
+}
 const form = document.querySelector('#verify-form');
 const input = document.querySelector('#announcement-url');
 const button = document.querySelector('#verify-button');
